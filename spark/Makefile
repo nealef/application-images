@@ -22,12 +22,12 @@ spark:
 zeppelin-build:
 	docker build --rm -t docker.io/sinenomine/zeppelin-build zeppelin-build
 	docker tag docker.io/sinenomine/zeppelin-build docker.io/sinenomine/zeppelin-build:$(TAG)
-	docker tag -f docker.io/sinenomine/zeppelin-build:$(ZEPPELIN_TAG) gcr.io/google_containers/zeppelin-build:$(ZEPPELIN_TAG)
+	docker tag docker.io/sinenomine/zeppelin-build:$(ZEPPELIN_TAG) gcr.io/google_containers/zeppelin-build:$(ZEPPELIN_TAG)
 
 zeppelin:
-	docker build --rm -t docker.io/sinenomine/zeppelini zeppelin
+	docker build --rm -t docker.io/sinenomine/zeppelin zeppelin
 	docker tag docker.io/sinenomine/zeppelin docker.io/sinenomine/zeppelin:$(TAG)
-	docker tag -f docker.io/sinenomine/zeppelin:$(ZEPPELIN_TAG) gcr.io/google_containers/zeppelin:$(ZEPPELIN_TAG)
+	docker tag docker.io/sinenomine/zeppelin:$(ZEPPELIN_TAG) gcr.io/google_containers/zeppelin:$(ZEPPELIN_TAG)
 
 push-spark: spark
 	docker push docker.io/sinenomine/spark:
