@@ -16,10 +16,5 @@
 
 . /start-common.sh
 
-serverHost=`hostname -f`
-serverIP=`hostname -i`
-sed -i'' -e s/spark-master/${serverIP}/ /opt/ibm/spark/conf/spark-defaults.conf
-
 # Run spark-class directly so that when it exits (or crashes), the pod restarts.
-spark-class org.apache.spark.deploy.master.Master -i ${serverHost} --port 7077 --webui-port 8080
-sleep 10m
+spark-class org.apache.spark.deploy.master.Master --ip spark-master --port 7077 --webui-port 8080
