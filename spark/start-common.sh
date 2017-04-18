@@ -27,4 +27,4 @@ unset SPARK_MASTER_PORT
 # spark.{executor,driver}.extraLibraryPath don't actually seem to
 # work, this seems to be the only reliable way to get the native libs
 # picked up.
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/hadoop/lib/native
+export PATH=${JAVA_HOME}/bin:${SPARK_HOME}/bin:$PATH

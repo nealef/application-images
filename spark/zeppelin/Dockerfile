@@ -15,13 +15,13 @@
 # This image relies on the zeppelin-build image to get the zeppelin
 # binaries built, and the Makefile to put it in this directory.
 
-FROM gcr.io/google_containers/spark-base:latest
+FROM sinenomine/spark:latest
 
-ENV ZEPPELIN_VER  0.5.6-incubating
+ENV ZEPPELIN_VER  0.7.1
 
 RUN mkdir -p /opt && \
     cd /opt && \
-    curl http://www.us.apache.org/dist/incubator/zeppelin/${ZEPPELIN_VER}/zeppelin-${ZEPPELIN_VER}-bin-all.tgz | \
+    curl http://www.us.apache.org/dist/zeppelin/zeppelin-${ZEPPELIN_VER}/zeppelin-${ZEPPELIN_VER}-bin-all.tgz | \
         tar -zx && \
     ln -s zeppelin-${ZEPPELIN_VER}-bin-all zeppelin && \
     echo Zeppelin ${ZEPPELIN_VER} installed in /opt
