@@ -17,7 +17,16 @@
 export ZEPPELIN_HOME=/opt/zeppelin
 export ZEPPELIN_CONF_DIR="${ZEPPELIN_HOME}/conf"
 
-mkdir -p /opt/zeppelin/vol/webapps
+mkdir -p /opt/zeppelin/vol/{conf,webapps,logs,run,notebook,local-repo}
+
+#
+# If this is the first time we've started up then copy the 
+# initial configuration files from the template area
+#
+if [ ! -e /opt/zeppelin/vol/conf/interpreter.json ]; then
+    cp -a /opt/zeppelin/conf_tmpl/* /opt/zeppelin/vol/conf/.
+    cp -a /opt/zeppelin/notebook_tmpl/* /opt/zeppelin/vol/notebook/.
+fi
 
 echo "=== Launching Zeppelin under Docker ==="
 /opt/zeppelin/bin/zeppelin.sh "${ZEPPELIN_CONF_DIR}"

@@ -4,8 +4,8 @@ metadata:
   name: spark-ui-proxy
 spec:
   ports:
-    - port: 80
-      targetPort: 80
+    - port: 8080
+      targetPort: 8080
   selector:
     component: spark-ui-proxy
   type: LoadBalancer

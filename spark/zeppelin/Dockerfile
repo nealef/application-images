@@ -15,23 +15,32 @@
 # This image relies on the zeppelin-build image to get the zeppelin
 # binaries built, and the Makefile to put it in this directory.
 
-FROM sinenomine/spark:latest
+FROM 	sinenomine/spark:latest
 
-ENV ZEPPELIN_VER  0.7.1
+ENV 	ZEPPELIN_VER  0.7.1
 
-RUN mkdir -p /opt && \
-    cd /opt && \
-    curl http://www.us.apache.org/dist/zeppelin/zeppelin-${ZEPPELIN_VER}/zeppelin-${ZEPPELIN_VER}-bin-all.tgz | \
-        tar -zx && \
-    ln -s zeppelin-${ZEPPELIN_VER}-bin-all zeppelin && \
-    echo Zeppelin ${ZEPPELIN_VER} installed in /opt
+RUN 	mkdir -p /opt && \
+    	cd /opt && \
+    	curl http://www.us.apache.org/dist/zeppelin/zeppelin-${ZEPPELIN_VER}/zeppelin-${ZEPPELIN_VER}-bin-all.tgz | \
+    	    tar -zx && \
+    	ln -s zeppelin-${ZEPPELIN_VER}-bin-all zeppelin && \
+    	echo Zeppelin ${ZEPPELIN_VER} installed in /opt
 
-ADD zeppelin-log4j.properties /opt/zeppelin/conf/log4j.properties
-ADD zeppelin-env.sh /opt/zeppelin/conf/zeppelin-env.sh
-ADD docker-zeppelin.sh /opt/zeppelin/bin/docker-zeppelin.sh
-ADD zeppelin-site.xml /opt/zeppelin/conf/zeppelin-site.xml
+ADD 	zeppelin-log4j.properties /opt/zeppelin/conf/log4j.properties
+ADD 	zeppelin-env.sh /opt/zeppelin/conf/zeppelin-env.sh
+ADD 	docker-zeppelin.sh /opt/zeppelin/bin/docker-zeppelin.sh
+ADD 	zeppelin-site.xml /opt/zeppelin/conf/zeppelin-site.xml
 
 VOLUME	/opt/zeppelin/vol
 
-EXPOSE 8080
+RUN 	mv /opt/zeppelin/conf /opt/zeppelin/conf_tmpl && \
+ 	mv /opt/zeppelin/notebook /opt/zeppelin/notebook_tmpl && \
+    	ln -sf /opt/zeppelin/vol/conf /opt/zeppelin/conf && \
+    	ln -sf /opt/zeppelin/vol/logs /opt/zeppelin/logs && \
+    	ln -sf /opt/zeppelin/vol/run /opt/zeppelin/run && \
+    	ln -sf /opt/zeppelin/vol/notebook /opt/zeppelin/notebook && \
+    	ln -sf /opt/zeppelin/vol/local-repo /opt/zeppelin/local-repo
+
+EXPOSE 	8080
+
 ENTRYPOINT ["/opt/zeppelin/bin/docker-zeppelin.sh"]
