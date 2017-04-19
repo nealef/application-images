@@ -29,7 +29,7 @@ RUN mkdir -p /opt && \
 ADD zeppelin-log4j.properties /opt/zeppelin/conf/log4j.properties
 ADD zeppelin-env.sh /opt/zeppelin/conf/zeppelin-env.sh
 ADD docker-zeppelin.sh /opt/zeppelin/bin/docker-zeppelin.sh
-ADD zeppelin-site.xml /opt/zeppelin/conf/zeppelin.site.xml
+ADD zeppelin-site.xml /opt/zeppelin/conf/zeppelin-site.xml
 
 VOLUME	/opt/zeppelin/vol
 
