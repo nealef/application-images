@@ -26,10 +26,15 @@ RUN 	mkdir -p /opt && \
     	ln -s zeppelin-${ZEPPELIN_VER}-bin-all zeppelin && \
     	echo Zeppelin ${ZEPPELIN_VER} installed in /opt
 
+RUN	yum install -y --setopt=tsflags=nodocs wget && \
+	yum clean all && \
+	rm -rf /var/cache/yum/* /tmp/* /var/log/yum.log
+	
 ADD 	zeppelin-log4j.properties /opt/zeppelin/conf/log4j.properties
 ADD 	zeppelin-env.sh /opt/zeppelin/conf/zeppelin-env.sh
 ADD 	docker-zeppelin.sh /opt/zeppelin/bin/docker-zeppelin.sh
 ADD 	zeppelin-site.xml /opt/zeppelin/conf/zeppelin-site.xml
+ADD	shiro.ini /opt/zeppelin/conf/shiro.ini
 
 VOLUME	/opt/zeppelin/vol
 
