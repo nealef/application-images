@@ -26,7 +26,7 @@ zeppelin-build:
 
 zeppelin:
 	docker build --rm -t docker.io/sinenomine/zeppelin zeppelin
-	docker tag docker.io/sinenomine/zeppelin docker.io/sinenomine/zeppelin:$(TAG)
+	docker tag docker.io/sinenomine/zeppelin docker.io/sinenomine/zeppelin:$(ZEPPELIN_TAG)
 	docker tag docker.io/sinenomine/zeppelin:$(ZEPPELIN_TAG) gcr.io/google_containers/zeppelin:$(ZEPPELIN_TAG)
 
 push-spark: spark

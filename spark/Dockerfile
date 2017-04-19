@@ -24,8 +24,6 @@ RUN 	yum update --setopt=tsflags=nodocs -y && \
 RUN 	cd /opt/ibm/spark/lib && \
     	curl -O https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-latest-hadoop2.jar
 
-RUN	chown 0:0 /etc/hosts && chmod +w /etc/hosts
-
 ADD 	log4j.properties /opt/ibm/spark/conf/log4j.properties
 ADD 	start-common.sh start-worker start-master /
 ADD 	core-site.xml /opt/ibm/spark/conf/core-site.xml
