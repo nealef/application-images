@@ -1,0 +1,419 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "spark",
+        "creationTimestamp": null
+    },
+    "labels": {
+        "template": "spark"
+    },
+    "parameters": [
+        {
+            "description": "The name for the application.",
+            "name": "APPLICATION_NAME",
+            "value": "spark",
+            "required": true
+        },
+        {
+            "description": "The host name for the UI.",
+            "name": "SPARK_UI_HOST",
+            "value": "spark-ui-proxy",
+            "required": true
+        },
+        {
+            "description": "The host name for the Zeppelin.",
+            "name": "ZEPPELIN_HOST",
+            "value": "spark-zeppelin",
+            "required": true
+        },
+        {
+            "description": "The Persistent Volume Claim Name for Zeppelin.",
+            "name": "ZEPPELIN_CLAIM",
+            "value": "zeppelin-claim",
+            "required": true
+        }
+    ],
+    "objects": [
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-master",
+                "generation": 1,
+                "creationTimestamp": null,
+                "labels": {
+                    "deploymentConfig": "${APPLICATION_NAME}-master",
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}-master"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "deploymentConfig": "${APPLICATION_NAME}-master"
+                        },
+                        "annotations": {
+                            "pod.beta.kubernetes.io/hostname": "${APPLICATION_NAME}-master"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "${APPLICATION_NAME}-master",
+                                "image": "docker.io/sinenomine/spark:1.5.2",
+                                "command": [
+                                    "/start-master"
+                                ],
+                                "ports": [
+                                    {
+                                        "containerPort": 7077,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "APPLICATION_NAME",
+                                        "value": "${APPLICATION_NAME}"
+                                    }
+                                ],
+                                "resources": {
+                                    "requests": {
+                                        "cpu": "100m"
+                                    }
+                                },
+                                "imagePullPolicy": "IfNotPresent"
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "securityContext": {}
+                    }
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-ui-proxy",
+                "generation": 1,
+                "creationTimestamp": null,
+                "labels": {
+                    "component": "${APPLICATION_NAME}-ui-proxy",
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}-ui-proxy"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "deploymentConfig": "${APPLICATION_NAME}-ui-proxy"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "${APPLICATION_NAME}-ui-proxy",
+                                "image": "docker.io/sinenomine/spark-ui-proxy:1.0",
+                                "args": [
+                                    "${APPLICATION_NAME}-master:8080"
+                                ],
+                                "ports": [
+                                    {
+                                        "containerPort": 80,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "APPLICATION_NAME",
+                                        "value": "${APPLICATION_NAME}"
+                                    }
+                                ],
+                                "resources": {
+                                    "requests": {
+                                        "cpu": "100m"
+                                    }
+                                },
+                                "livenessProbe": {
+                                    "httpGet": {
+                                        "path": "/",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 120,
+                                    "timeoutSeconds": 5,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "failureThreshold": 3
+                                },
+                                "imagePullPolicy": "IfNotPresent"
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "securityContext": {}
+                    }
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-worker",
+                "generation": 1,
+                "creationTimestamp": null,
+                "labels": {
+                    "deploymentConfig": "${APPLICATION_NAME}-worker",
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "replicas": 2,
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}-worker"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "deploymentConfig": "${APPLICATION_NAME}-worker"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "${APPLICATION_NAME}-worker",
+                                "image": "docker.io/sinenomine/spark:1.5.2",
+                                "command": [
+                                    "/start-worker"
+                                ],
+                                "ports": [
+                                    {
+                                        "containerPort": 8081,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "APPLICATION_NAME",
+                                        "value": "${APPLICATION_NAME}"
+                                    }
+                                ],
+                                "resources": {
+                                    "requests": {
+                                        "cpu": "100m"
+                                    }
+                                },
+                                "imagePullPolicy": "IfNotPresent"
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "securityContext": {}
+                    }
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-zeppelin",
+                "generation": 1,
+                "creationTimestamp": null,
+                "labels": {
+                    "deploymentConfig": "${APPLICATION_NAME}-zeppelin",
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}-zeppelin"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "deploymentConfig": "${APPLICATION_NAME}-zeppelin"
+                        }
+                    },
+                    "spec": {
+                        "volumes": [
+                            {
+                                "name": "webapps",
+                                "persistentVolumeClaim": {
+                                    "claimName": "${ZEPPELIN_CLAIM}"
+                                }
+                            }
+                        ],
+                        "containers": [
+                            {
+                                "name": "${APPLICATION_NAME}-zeppelin",
+                                "image": "docker.io/sinenomine/zeppelin:7.0.1",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "APPLICATION_NAME",
+                                        "value": "${APPLICATION_NAME}"
+                                    }
+                                ],
+                                "resources": {
+                                    "requests": {
+                                        "cpu": "100m"
+                                    }
+                                },
+                                "volumeMounts": [
+                                    {
+                                        "name": "webapps",
+                                        "mountPath": "/opt/zeppelin/vol"
+                                    }
+                                ],
+                                "imagePullPolicy": "Always"
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "securityContext": {}
+                    }
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-ui-proxy",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "host": "${SPARK_UI_HOST}",
+                "to": {
+                    "kind": "Service",
+                    "name": "${APPLICATION_NAME}-ui-proxy",
+                    "weight": 100
+                },
+                "wildcardPolicy": "None"
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-zeppelin",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "host": "${ZEPPELIN_HOST}",
+                "to": {
+                    "kind": "Service",
+                    "name": "${APPLICATION_NAME}-zeppelin",
+                    "weight": 100
+                },
+                "wildcardPolicy": "None"
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-master",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "spark",
+                        "protocol": "TCP",
+                        "port": 7077,
+                        "targetPort": 7077
+                    },
+                    {
+                        "name": "http",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}-master"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-ui-proxy",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080,
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}-ui-proxy"
+                },
+                "type": "LoadBalancer",
+                "sessionAffinity": "None"
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-zeppelin",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "protocol": "TCP",
+                        "port": 80,
+                        "targetPort": 8080,
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}-zeppelin"
+                },
+                "type": "LoadBalancer",
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        }
+    ]
+}
