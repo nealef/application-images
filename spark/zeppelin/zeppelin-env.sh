@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export MASTER="spark://spark-master:7077"
+export MASTER="spark://${APPLICATION_NAME}-master:7077"
 export SPARK_HOME=/opt/ibm/spark
 export ZEPPELIN_JAVA_OPTS="-Dspark.jars=/opt/spark/lib/gcs-connector-latest-hadoop2.jar"
 # TODO(zmerlynn): Setting global CLASSPATH *should* be unnecessary,

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 . /start-common.sh
+MASTER=${APPLICATION_NAME}-master
 
 # Run spark-class directly so that when it exits (or crashes), the pod restarts.
-spark-class org.apache.spark.deploy.master.Master --ip spark-master --port 7077 --webui-port 8080
+spark-class org.apache.spark.deploy.master.Master --ip ${MASTER} --port 7077 --webui-port 8080
