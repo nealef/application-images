@@ -6,7 +6,7 @@ ENV 	spark_ver 1.5.2
 COPY 	IBM_Spark_DK_1.5.2.0_Linux_s390x.bin spark.rsp /
 
 RUN 	yum update --setopt=tsflags=nodocs -y && \
-        yum install -y --setopt=tsflags=nodocs net-tools curl tar zip telnet hostname procps-ng && \
+        yum install -y --setopt=tsflags=nodocs net-tools curl tar unzip zip telnet hostname procps-ng && \
         echo "Installing Apache Spark" && \
         /IBM_Spark_DK_1.5.2.0_Linux_s390x.bin -f /spark.rsp -i silent && \
         rm -f /IBM_Spark_DK_1.5.2.0_Linux_s390x.bin /spark.rsp cbe* && \

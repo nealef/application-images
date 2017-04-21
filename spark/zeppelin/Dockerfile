@@ -46,6 +46,12 @@ RUN 	mv /opt/zeppelin/conf /opt/zeppelin/conf_tmpl && \
     	ln -sf /opt/zeppelin/vol/notebook /opt/zeppelin/notebook && \
     	ln -sf /opt/zeppelin/vol/local-repo /opt/zeppelin/local-repo
 
+ADD	lucene-*.jar /opt/zeppelin/lib/
+
+RUN	rm -f /opt/zeppelin/lib/lucene-*-5.3.1.jar
+
+WORKDIR	/opt/zeppelin/vol
+
 EXPOSE 	8080
 
 ENTRYPOINT ["/opt/zeppelin/bin/docker-zeppelin.sh"]
