@@ -30,7 +30,7 @@ zeppelin:
 	docker tag docker.io/sinenomine/zeppelin:$(ZEPPELIN_TAG) gcr.io/google_containers/zeppelin:$(ZEPPELIN_TAG)
 
 push-spark: spark
-	docker push docker.io/sinenomine/spark:
+	docker push docker.io/sinenomine/spark
 	docker push docker.io/sinenomine/spark:$(TAG)
 
 push-zeppelin: zeppelin
