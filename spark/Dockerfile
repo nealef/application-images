@@ -6,19 +6,22 @@ ENV 	spark_ver 1.5.2
 COPY 	IBM_Spark_DK_1.5.2.0_Linux_s390x.bin spark.rsp /
 
 RUN 	yum update --setopt=tsflags=nodocs -y && \
-        yum install -y --setopt=tsflags=nodocs net-tools curl tar unzip zip telnet hostname procps-ng && \
+        yum install -y --setopt=tsflags=nodocs net-tools curl which tar unzip zip telnet hostname procps-ng && \
         echo "Installing Apache Spark" && \
         /IBM_Spark_DK_1.5.2.0_Linux_s390x.bin -f /spark.rsp -i silent && \
         rm -f /IBM_Spark_DK_1.5.2.0_Linux_s390x.bin /spark.rsp cbe* && \
 	yum clean all && \
 	rm -rf /var/log/yum.log /tmp/* /var/cache/yum/*
 
-#RUN 	mkdir -p /opt && \
-#	cd /opt && \
-#	curl http://www.us.apache.org/dist/hadoop/common/hadoop-${hadoop_ver}/hadoop-${hadoop_ver}.tar.gz | \
-#		tar -zx hadoop-${hadoop_ver}/lib/native && \
-#	ln -s hadoop-${hadoop_ver} hadoop && \
-#	echo Hadoop ${hadoop_ver} native libraries installed in /opt/hadoop/lib/native
+COPY	hadoop-${hadoop_ver}.tar.gz /
+
+# Add Hadoop
+RUN 	mkdir -p /opt && \
+	cd /opt && \
+	tar -xzf /hadoop-${hadoop_ver}.tar.gz && \
+	ln -s hadoop-${hadoop_ver} hadoop && \
+	rm -f /hadoop-${hadoop_ver}.tar.gz && \
+	echo Hadoop ${hadoop_ver} native libraries installed in /opt/hadoop/lib/native
 
 # Add the GCS connector.
 RUN 	cd /opt/ibm/spark/lib && \
@@ -29,4 +32,4 @@ ADD 	start-common.sh start-worker start-master /
 ADD 	core-site.xml /opt/ibm/spark/conf/core-site.xml
 ADD 	spark-defaults.conf /opt/ibm/spark/conf/spark-defaults.conf
 
-ENV 	SPARK_HOME=/opt/ibm/spark JAVA_HOME=/opt/ibm/java PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin:$JAVA_HOME/bin
+ENV 	SPARK_HOME=/opt/ibm/spark JAVA_HOME=/opt/ibm/java PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin:$JAVA_HOME/bin:/opt/hadoop/bin
